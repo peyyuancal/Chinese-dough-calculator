@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8" />
+  <title>中式面点配方计算器</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <!-- PWA meta -->
+  <meta name="theme-color" content="#ffffff" />
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="apple-mobile-web-app-title" content="中式面团计算器">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="icon-192.png">
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", system-ui, sans-serif;
+      margin: 0;
+      padding: 16px;
+      background: #f5f5f5;
+    }
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      background: #ffffff;
+      padding: 16px 18px 24px;
+      border-radius: 14px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+    }
+    h1 {
+      font-size: 1.35rem;
+      margin: 0 0 8px;
+      text-align: center;
+    }
+    h2 {
+      font-size: 1rem;
+      margin: 16px 0 6px;
+      border-bottom: 1px solid #eee;
+      padding-bottom: 3px;
+    }
+    .section {
+      margin-top: 6px;
+      margin-bottom: 10px;
+    }
+    .field-row {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .field {
+      flex: 1;
+    }
+    label {
+      display: block;
+      font-size: 0.8rem;
+      margin-bottom: 3px;
+    }
+    input[type="number"],
+    input[type="text"] {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 7px 8px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      font-size: 0.95rem;
+    }
+    .hint {
+      font-size: 0.75rem;
+      color: #777;
+      margin-top: 2px;
+    }
+    button {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 999px;
+      border: none;
+      font-size: 1rem;
+      margin-top: 8px;
+      cursor: pointer;
+      background: #1976d2;
+      color: #fff;
+    }
+    button:active {
+      opacity: 0.85;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      margin-top: 4px;
+    }
+    th, td {
+      padding: 4px 5px;
+      border-bottom: 1px solid #eee;
+      text-align: right;
+    }
+    th:first-child, td:first-child {
+      text-align: left;
+    }
+    .summary-line {
+      font-size: 0.8rem;
+      color: #444;
+      margin-top: 4px;
+    }
+    .badge {
+      display: inline-block;
+      padding: 1px 6px;
+      border-radius: 999px;
+      background: #e3f2fd;
+      font-size: 0.75rem;
+      margin-left: 4px;
+    }
+    .results-block {
+      margin-top: 10px;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: #f7f9ff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <h1>中式面点配方计算器</h1>
+
+    <!-- 基本设置 -->
+    <div class="section">
+      <h2>基本设置</h2>
+      <div class="field-row">
+        <div class="field">
+          <label for="pieceWeight">每个重量</label>
+          <input type="number" id="pieceWeight" value="6" step="0.1" />
+          <div class="hint">每个成品重量（克）</div>
+        </div>
+        <div class="field">
+          <label for="pieceCount">数量</label>
+          <input type="number" id="pieceCount" value="20" step="1" />
+          <div class="hint">需要做几个</div>
+        </div>
+      </div>
+      <div class="field-row">
+        <div class="field">
+          <label for="extraWeight">预加重量</label>
+          <input type="number" id="extraWeight" value="3" step="0.1" />
+          <div class="hint">额外预留面团（克）</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 配方比例 -->
+    <div class="section">
+      <h2>配方比例（占面粉百分比）</h2>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="wholewheatPct">全麦比例 %</label>
+          <input type="text" id="wholewheatPct" inputmode="decimal" value="0" />
+          <div class="hint">0–100，普通粉 = 100% - 全麦%</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="yeastPct">酵母 %</label>
+          <input type="text" id="yeastPct" inputmode="decimal" value="10" />
+          <div class="hint">如 1 = 1%，10 = 10%</div>
+        </div>
+        <div class="field">
+          <label for="saltPct">盐 %</label>
+          <input type="text" id="saltPct" inputmode="decimal" value="0" />
+          <div class="hint">如 1.5 = 1.5%</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="sugarPct">糖 %</label>
+          <input type="text" id="sugarPct" inputmode="decimal" value="10" />
+          <div class="hint">糖=面粉的百分比</div>
+        </div>
+        <div class="field">
+          <label for="oilPct">油 %</label>
+          <input type="text" id="oilPct" inputmode="decimal" value="0" />
+          <div class="hint">油=面粉的百分比</div>
+        </div>
+      </div>
+
+      <div class="field-row">
+        <div class="field">
+          <label for="waterPct">总水量 %</label>
+          <input type="text" id="waterPct" inputmode="decimal" value="58" />
+          <div class="hint">总水=面粉的百分比</div>
+        </div>
+        <div class="field">
+          <label for="hotWaterPct">热水占水比例 %</label>
+          <input type="text" id="hotWaterPct" inputmode="decimal" value="0" />
+          <div class="hint">如 30 = 30% 热水、70% 凉水</div>
+        </div>
+      </div>
+    </div>
+
+    <button onclick="calculate()">计算</button>
+
+    <!-- 结果 -->
+    <div id="results" style="display:none;">
+      <div class="results-block">
+        <div class="summary-line">
+          目标面团净重量: <span id="targetDough"></span>
+          <span class="badge" id="pieceInfo"></span>
+        </div>
+      </div>
+
+      <div class="section">
+        <h2>材料用量（克）</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>材料</th>
+              <th>重量（克）</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>普通面粉</td><td id="gFlourWhite"></td></tr>
+            <tr><td>全麦面粉</td><td id="gFlourWhole"></td></tr>
+            <tr><td>酵母</td><td id="gYeast"></td></tr>
+            <tr><td>盐</td><td id="gSalt"></td></tr>
+            <tr><td>糖</td><td id="gSugar"></td></tr>
+            <tr><td>油</td><td id="gOil"></td></tr>
+            <tr><td>凉水</td><td id="gColdWater"></td></tr>
+            <tr><td>热水</td><td id="gHotWater"></td></tr>
+            <tr><th>总面团重量（计算）</th><th id="gTotal"></th></tr>
+          </tbody>
+        </table>
+        <div class="summary-line">
+          提示：总面团重量应接近目标净重量（可能有1克左右误差）。
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // 所有输入都视为“百分比数值”，例如：
+    // 10 → 10% → 0.10
+    // 0.8 → 0.8% → 0.008
+    function parsePct(raw) {
+      if (raw == null) return 0;
+      let v = parseFloat(raw);
+      if (isNaN(v)) return 0;
+      return v / 100.0;
+    }
+
+    function fmtGrams(x) {
+      if (!isFinite(x)) return "-";
+      return Math.round(x) + " g";
+    }
+
+    // 给百分比输入加上 " %" 显示，并且空白时自动变成 0%
+    function setupPercentField(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      // 初始格式化
+      const init = el.value.trim();
+      if (init === "") {
+        el.value = "0 %";
+      } else {
+        const num = parseFloat(init);
+        el.value = isNaN(num) ? "0 %" : num + " %";
+      }
+
+      el.addEventListener("focus", () => {
+        const v = el.value.replace("%", "").trim();
+        el.value = v;
+      });
+
+      el.addEventListener("blur", () => {
+        let v = el.value.trim();
+        if (v === "") {
+          // 空白 = 0%
+          el.value = "0 %";
+          return;
+        }
+        const num = parseFloat(v);
+        el.value = isNaN(num) ? "0 %" : num + " %";
+      });
+    }
+
+    function setupAllPercentFields() {
+      setupPercentField("wholewheatPct");
+      setupPercentField("yeastPct");
+      setupPercentField("saltPct");
+      setupPercentField("sugarPct");
+      setupPercentField("oilPct");
+      setupPercentField("waterPct");
+      setupPercentField("hotWaterPct");
+    }
+
+    function calculate() {
+      const pieceWeight = parseFloat(document.getElementById("pieceWeight").value) || 0;
+      const pieceCount  = parseFloat(document.getElementById("pieceCount").value)  || 0;
+      const extraWeight = parseFloat(document.getElementById("extraWeight").value) || 0;
+
+      const targetDough = pieceWeight * pieceCount + extraWeight;
+      if (targetDough <= 0) {
+        alert("请先输入有效的 每个重量 / 数量 / 预加重量。");
+        return;
+      }
+
+      // 读入并转换为小数比例（全部按百分比）
+      const wholewheatFrac = parsePct(
+        document.getElementById("wholewheatPct").value
+      );
+      if (wholewheatFrac < 0 || wholewheatFrac > 1) {
+        alert("全麦比例请填 0–100 之间。");
+        return;
+      }
+      const whiteFrac = 1 - wholewheatFrac;
+
+      const yeastFrac = parsePct(document.getElementById("yeastPct").value);
+      const saltFrac  = parsePct(document.getElementById("saltPct").value);
+      const sugarFrac = parsePct(document.getElementById("sugarPct").value);
+      const oilFrac   = parsePct(document.getElementById("oilPct").value);
+      const waterFrac = parsePct(document.getElementById("waterPct").value);
+      const hotFrac   = parsePct(document.getElementById("hotWaterPct").value);
+
+      if (hotFrac < 0 || hotFrac > 1) {
+        alert("热水占水比例请填 0–100 之间。");
+        return;
+      }
+      const coldFrac = 1 - hotFrac;
+
+      // 面粉 + 酵母 + 盐 + 糖 + 油 + 水 共同决定总重量
+      const denom = whiteFrac + wholewheatFrac + yeastFrac + saltFrac + sugarFrac + oilFrac + waterFrac;
+      if (denom <= 0) {
+        alert("配方比例有问题：面粉 + 酵母 + 盐 + 糖 + 油 + 水 总比例不能为 0。");
+        return;
+      }
+
+      const totalFlour = targetDough / denom; // 面粉总量
+
+      // 分解
+      const flourWhite = totalFlour * whiteFrac;
+      const flourWhole = totalFlour * wholewheatFrac;
+      const yeast      = totalFlour * yeastFrac;
+      const salt       = totalFlour * saltFrac;
+      const sugar      = totalFlour * sugarFrac;
+      const oil        = totalFlour * oilFrac;
+      const totalWater = totalFlour * waterFrac;
+      const coldWater  = totalWater * coldFrac;
+      const hotWater   = totalWater * hotFrac;
+
+      const totalCalc  = flourWhite + flourWhole + yeast + salt + sugar + oil + coldWater + hotWater;
+
+      // 显示结果
+      document.getElementById("targetDough").textContent = fmtGrams(targetDough);
+      document.getElementById("pieceInfo").textContent =
+        pieceCount + " 个，每个约 " + pieceWeight + " g";
+
+      document.getElementById("gFlourWhite").textContent = fmtGrams(flourWhite);
+      document.getElementById("gFlourWhole").textContent = fmtGrams(flourWhole);
+      document.getElementById("gYeast").textContent      = fmtGrams(yeast);
+      document.getElementById("gSalt").textContent       = fmtGrams(salt);
+      document.getElementById("gSugar").textContent      = fmtGrams(sugar);
+      document.getElementById("gOil").textContent        = fmtGrams(oil);
+      document.getElementById("gColdWater").textContent  = fmtGrams(coldWater);
+      document.getElementById("gHotWater").textContent   = fmtGrams(hotWater);
+      document.getElementById("gTotal").textContent      = fmtGrams(totalCalc);
+
+      document.getElementById("results").style.display = "block";
+    }
+
+    // 注册 service worker（PWA）
+    if ('serviceWorker' in navigator) {
+      window.addEventListener('load', function() {
+        navigator.serviceWorker.register('sw.js').catch(function(err) {
+          console.log('Service worker registration failed:', err);
+        });
+      });
+    }
+
+    // 页面加载完：先给百分比字段加上 “0 % / 初始值 %”，然后算一遍
+    window.addEventListener("load", () => {
+      setupAllPercentFields();
+      calculate();
+    });
+  </script>
+</body>
+</html>

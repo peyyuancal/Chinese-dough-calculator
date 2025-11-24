@@ -1,0 +1,20 @@
+{
+  "name": "Chinese Dough Calculator",
+  "short_name": "Dough Calc",
+  "start_url": "chinese_dough_calculator_pwa.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#ffffff",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
